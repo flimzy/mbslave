@@ -40,7 +40,7 @@ def read_env_item(obj, key, name, convert=None):
 class DatabaseConfig(object):
 
     def __init__(self) -> None:
-        self.name = 'musicbrainz'
+        self.name: Optional[str] = 'musicbrainz'
         self.host: Optional[str] = None
         self.port: Optional[int] = None
         self.user: str = 'musicbrainz'
