@@ -496,6 +496,12 @@ def mbslave_sync_main(config: Config, args: argparse.Namespace) -> None:
         cursor = db.cursor()
         cursor.execute("SELECT current_schema_sequence, current_replication_sequence FROM %s.replication_control" % config.schemas.name('musicbrainz'))
         schema_seq, replication_seq = cursor.fetchone()
+
+        # If we've reached the target replication sequence, we're done!
+        if replication_seq >= args.seq:
+            print('Reached target replication sequence %d, stopping' % args.seq)
+            break
+
         replication_seq += 1
         hook = hook_class(config, db, config)
         try:
@@ -755,6 +761,7 @@ def main():
     parser_sync = subparsers.add_parser('sync')
     parser_sync.add_argument('-r', '--keep-running', dest='keep_running', action='store_true',
                              help='keep running until the script is explicitly terminated')
+    parser_sync.add_argument('--seq', type=int, dest='seq', help='replication sequence to sync to')
     parser_sync.set_defaults(func=mbslave_sync_main)
 
     parser_remap_schema = subparsers.add_parser('remap-schema')
