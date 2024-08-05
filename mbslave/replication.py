@@ -498,9 +498,10 @@ def mbslave_sync_main(config: Config, args: argparse.Namespace) -> None:
         schema_seq, replication_seq = cursor.fetchone()
 
         # If we've reached the target replication sequence, we're done!
-        if replication_seq >= args.seq:
-            print('Reached target replication sequence %d, stopping' % args.seq)
-            break
+        if hasattr(args, 'seq') and args.seq is not None:
+            if replication_seq >= args.seq:
+                print('Reached target replication sequence %d, stopping' % args.seq)
+                break
 
         replication_seq += 1
         hook = hook_class(config, db, config)
